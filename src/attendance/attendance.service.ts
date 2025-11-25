@@ -22,6 +22,16 @@ export class AttendanceService {
   ) {}
 
   /**
+     * 取得當前使用者狀態
+     */
+  private async getActiveSession(): Promise<AttendanceDocument | null> {
+    return this.attendanceModel.findOne({
+      userId: this.MOCK_USER_ID,
+      checkOut: null,
+    });
+  }
+
+  /**
    * 執行上班打卡 (Check-in)
    *
    * 檢查該使用者是否已有「進行中 (Active)」的會話。
@@ -31,20 +41,17 @@ export class AttendanceService {
    * @returns {Promise<Attendance>} 回傳新建立的打卡紀錄
    */
   async checkIn(): Promise<Attendance> {
-    // 1. 檢查是否存在 checkOut 為 null 的紀錄
-    const activeSession = await this.attendanceModel.findOne({
-      userId: this.MOCK_USER_ID,
-      checkOut: null,
-    });
+    // 檢查是否存在 checkOut 為 null 的紀錄
+    const activeSession = await this.getActiveSession();
 
-    // 2. 若存在，代表尚未下班，阻擋重複打卡
+    // 存在，代表尚未下班，阻擋重複打卡
     if (activeSession) {
       throw new ConflictException(
         'User is already checked in. Please check out first.',
       );
     }
 
-    // 3. 建立新紀錄
+    // 建立新紀錄
     const newRecord = new this.attendanceModel({
       userId: this.MOCK_USER_ID,
       checkIn: new Date(),
@@ -57,28 +64,23 @@ export class AttendanceService {
    * 執行下班打卡 (Check-out)
    *
    * 搜尋該使用者最近一筆「尚未下班」的紀錄並進行更新。
-   * 計算從 checkIn 到現在的工時 (秒數)。
    *
    * @throws {BadRequestException} 當找不到進行中的打卡紀錄時拋出 (HTTP 400)
    * @returns {Promise<Attendance>} 回傳更新後的出勤紀錄 (含結束時間與工時)
    */
   async checkOut(): Promise<Attendance> {
-    // 1. 搜尋進行中的會話
-    const activeSession = await this.attendanceModel.findOne({
-      userId: this.MOCK_USER_ID,
-      checkOut: null,
-    });
+    // 搜尋進行中的會話
+    const activeSession = await this.getActiveSession();
 
-    // 2. 若無進行中會話，無法執行簽退
+    // 若無進行中會話，無法執行簽退
     if (!activeSession) {
       throw new BadRequestException(
         'No active session found. Please check in first.',
       );
     }
 
-    // 3. 更新狀態
+    // 更新狀態
     activeSession.checkOut = new Date();
-
     return activeSession.save();
   }
 
