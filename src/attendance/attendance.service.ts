@@ -90,16 +90,37 @@ export class AttendanceService {
   }
 
   /**
-   * 取得使用者的所有出勤紀錄
-   *
-   * 資料預設依照「打卡時間 (checkIn)」進行降冪排序 (最新的在最上面)。
-   *
-   * @returns {Promise<Attendance[]>} 出勤紀錄列表
-   */
-  async findAll(): Promise<Attendance[]> {
-    return this.attendanceModel
-      .find({ userId: this.MOCK_USER_ID })
-      .sort({ checkIn: -1 }) // -1 代表 Descending (降冪)
-      .exec();
+     * 取得使用者的出勤紀錄 (分頁模式)
+     * 
+     * 資料預設依照「打卡時間 (checkIn)」進行降冪排序 (最新的在最上面)。
+     * 
+     * @param page 目前頁碼 (預設 1)
+     * @param limit 每頁筆數 (預設 10)
+     */
+  async findAll(page: number, limit: number): Promise<{
+    data: Attendance[];
+    total: number;
+    page: number;
+    lastPage: number;
+  }> {
+    const skip = (page - 1) * limit;
+
+    // 平行執行：取得資料 + 計算總筆數
+    const [data, total] = await Promise.all([
+      this.attendanceModel
+        .find({ userId: this.MOCK_USER_ID })
+        .sort({ checkIn: -1 }) // 最新在前
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.attendanceModel.countDocuments({ userId: this.MOCK_USER_ID }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 }

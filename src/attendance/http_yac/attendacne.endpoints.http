@@ -3,6 +3,9 @@
 ### 查詢打卡紀錄
 GET {{baseUrl}}/attendance
 
+### 分頁查詢打卡紀錄
+GET {{baseUrl}}/attendance?page=1&limit=2
+
 ### 上班打卡 (預期: 201 Created)
 # 201 成功
 # 409 重複上班打卡 
