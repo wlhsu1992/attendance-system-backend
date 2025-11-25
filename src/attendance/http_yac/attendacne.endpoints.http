@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:3000
+
+### 查詢打卡紀錄
+GET {{baseUrl}}/attendance
+
+### 上班打卡 (預期: 201 Created)
+# 201 成功
+# 409 重複上班打卡 
+POST {{baseUrl}}/attendance/check-in
+
+### 下班打卡 
+# 200 成功 
+# 400 重複下班打卡
+PATCH {{baseUrl}}/attendance/check-out
