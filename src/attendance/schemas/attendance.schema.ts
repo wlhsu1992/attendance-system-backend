@@ -13,9 +13,6 @@ export class Attendance {
 
     @Prop({ default: null })
     checkOut: Date;
-
-    @Prop({ default: 0 })
-    duration: number; // 工時 (秒)
 }
 
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

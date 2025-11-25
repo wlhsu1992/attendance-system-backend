@@ -76,15 +76,8 @@ export class AttendanceService {
       );
     }
 
-    // 3. 計算工時
-    const checkOutTime = new Date();
-    const durationInSeconds = Math.floor(
-      (checkOutTime.getTime() - activeSession.checkIn.getTime()) / 1000,
-    );
-
-    // 4. 更新狀態
-    activeSession.checkOut = checkOutTime;
-    activeSession.duration = durationInSeconds;
+    // 3. 更新狀態
+    activeSession.checkOut = new Date();
 
     return activeSession.save();
   }

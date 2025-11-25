@@ -19,7 +19,6 @@ class MockAttendanceDoc {
   userId: string;
   checkIn: Date;
   checkOut: Date;
-  duration: number;
 
   // 模擬 save 方法，呼叫時直接回傳自己 (Promise)
   save = jest.fn().mockResolvedValue(this);
@@ -94,15 +93,14 @@ describe('AttendanceService', () => {
   });
 
   /**
-   * 測試案例：成功下班並計算工時 (Success Check-out with Duration Calculation)
+   * 測試案例：成功下班
    *
    * 情境：使用者有進行中的紀錄，且打卡時間為 10 秒前。
    * 預期：
    * 1. Service 成功回傳更新後的紀錄。
    * 2. checkOut 時間欄位應被設定。
-   * 3. duration (工時) 應正確計算為約 10 秒。
    */
-  it('should calculate duration correctly on check out', async () => {
+  it('should successfully check out', async () => {
     // Arrange: 模擬一筆 10 秒前建立的打卡紀錄
     const now = new Date();
     const tenSecondsAgo = new Date(now.getTime() - 10000);
@@ -115,7 +113,6 @@ describe('AttendanceService', () => {
     const result = await service.checkOut();
 
     // Assert: 驗證結果
-    expect(result.checkOut).toBeDefined(); // 結束時間應存在
-    expect(result.duration).toBeGreaterThanOrEqual(10); // 工時應 >= 10 秒
+    expect(result.checkOut).toBeDefined(); 
   });
 });
