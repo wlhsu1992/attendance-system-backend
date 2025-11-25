@@ -15,6 +15,12 @@ export class AttendanceController {
     return this.attendanceService.checkOut();
   }
 
+  @Get('status')
+  async getStatus() {
+    const isWorking = await this.attendanceService.isWorking();
+    return { isWorking };
+  }
+
   @Get()
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

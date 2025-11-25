@@ -32,6 +32,14 @@ export class AttendanceService {
   }
 
   /**
+   * 檢查使用者是否目前在工作
+   */
+  async isWorking(): Promise<boolean> {
+    const activeSession = await this.getActiveSession();
+    return !!activeSession;
+  }
+
+  /**
    * 執行上班打卡 (Check-in)
    *
    * 檢查該使用者是否已有「進行中 (Active)」的會話。
