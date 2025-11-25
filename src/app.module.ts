@@ -4,7 +4,10 @@ import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/attendance-db'),
+    MongooseModule.forRoot(
+      process.env.MONGO_URI ||
+      'mongodb://127.0.0.1:27017/attendance-db'
+    ),
     AttendanceModule,
   ],
   controllers: [],
